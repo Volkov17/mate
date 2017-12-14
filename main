@@ -1,0 +1,216 @@
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+#include <cstdlib>
+
+using namespace std;
+
+struct matr {
+    int** matrix=nullptr;
+    int a;
+    int b;
+};
+
+void createM(matr &matrix1,int argc, char* argv[]) {
+    matrix1.a = atoi(argv[1]);
+    matrix1.b = atoi(argv[2]);
+    if (matrix1.a <= 0 || matrix1.b <= 0) {
+        cout << "введите числа ,показывающие размер матрицы, большие нуля ";
+    } else {
+        matrix1.matrix = new int *[matrix1.a];
+        for (int i = 0; i < matrix1.a; i++) {
+            matrix1.matrix[i] = new int[matrix1.b];
+        }
+        for (int i = 0; i < matrix1.a; i++) {
+            for (int j = 0; j < matrix1.b; j++) {
+                matrix1.matrix[i][j] = 0;
+            }
+        }
+        int k=3;
+        for (int i = 0; i < matrix1.a; i++)
+            for (int j = 0; j < matrix1.b; j++, k++) {
+                if (k < argc)
+                    matrix1.matrix[i][j] = atoi(argv[k]);
+            }
+    }
+}
+
+void showM( matr matrix1) {
+    for (int i = 0; i < matrix1.a; i++) {
+        for (int j = 0; j < matrix1.b; j++)
+            cout << setw(4)<< matrix1.matrix[i][j];
+        cout<<endl;
+    }
+}
+
+void sumM( matr &matrix1) {
+    cout << "введите матрицу размером :" << matrix1.a << " на " << matrix1.b << endl;
+    int c;
+    for (int i = 0; i < matrix1.a; i++) {
+        for (int j = 0; j < matrix1.b; j++) {
+            cin >> c;
+            matrix1.matrix[i][j] += c;
+
+        }
+    }
+    cout << "результат " << endl;
+    for (int i = 0; i < matrix1.a; i++) {
+        for (int j = 0; j < matrix1.b; j++)
+            cout << setw(4) << matrix1.matrix[i][j];
+        cout << endl;
+
+    }
+}
+
+void umnozhM( matr &matrix1) {
+    cout << "введите размер матрицы через пробел:";
+    int n,m;
+    cin>>n;
+    cin>>m;
+    if (n==matrix1.b && m>0) {
+        if (n == matrix1.b) {
+            cout << "введите элементы матрицы:" << endl;
+            int **suppmatrix;
+            suppmatrix = new int *[n];
+            for (int i = 0; i < n; i++)
+                suppmatrix[i] = new int[m];
+            for (int i = 0; i < n; i++)
+                for (int j = 0; j < m; j++)
+                    suppmatrix[i][j]=0;
+            for (int i = 0; i < n; i++)
+                for (int j = 0; j < m; j++)
+                    cin>>suppmatrix[i][j];
+            int **finalmatrix;
+            finalmatrix = new int *[matrix1.a];
+            for (int i = 0; i < matrix1.a; i++)
+                finalmatrix[i] = new int[m];
+            for (int i = 0; i < matrix1.a; i++)
+                for (int j = 0; j < m; j++)
+                    finalmatrix[i][j] = 0;
+            for (int i = 0; i < matrix1.a; i++)
+                for (int j = 0; j < m; j++)
+                    for (int k = 0; k < n; k++)
+                        finalmatrix[i][j] += matrix1.matrix[i][k] * suppmatrix[k][j];
+            cout << "Результат:" << endl;
+            matrix1.b = m;
+            for (int i = 0; i < n; i++)
+                delete[] suppmatrix[i];
+            delete[] suppmatrix;
+            for (int i = 0; i < matrix1.a; i++)
+                delete[] matrix1.matrix[i];
+            delete[] matrix1.matrix;
+            matrix1.matrix = finalmatrix;
+            for (int i = 0; i < matrix1.a; i++) {
+                for (int j = 0; j < matrix1.b; j++)
+                    cout << setw(4) << matrix1.matrix[i][j];
+                cout << endl;
+            }
+        }
+    }
+    else {
+        cout << "введите числа ,показывающие размер матрицы, большие нуля ";
+    }
+}
+
+void transM(matr &matrix1) {
+    int **suppmatrix = new int *[matrix1.b];
+    for (int i = 0; i < matrix1.b; i++) {
+        suppmatrix[i] = new int[matrix1.a];
+    }
+    for (int i = 0; i < matrix1.b; i++) {
+        for (int j = 0; j < matrix1.a; j++) {
+            suppmatrix[i][j]=matrix1.matrix[j][i];
+        }
+    }
+    for (int i=0 ; i<matrix1.a; i++)
+        delete[]matrix1.matrix[i];
+    delete[] matrix1.matrix;
+    matrix1.matrix = suppmatrix;
+    swap(matrix1.a, matrix1.b);
+}
+
+void safeintofileM(matr matrix1) {
+    ofstream fout;
+    fout.open("matrix.txt");
+    fout << setw(4) << matrix1.a << setw(4) << matrix1.b<<endl;
+    for (int i = 0; i < matrix1.a; i++) {
+        for (int j = 0; j < matrix1.b; j++)
+            fout << setw(4)<< matrix1.matrix[i][j];
+        fout<<endl;
+    }
+    fout.close();
+}
+
+void loadfromfileM(matr &matrix1) {
+    ifstream fin;
+    fin.open("matrix.txt");
+    if (fin.is_open()){
+        fin >> matrix1.a >>matrix1.b;
+        matrix1.matrix = new int*[matrix1.a];
+        for (int i = 0; i < matrix1.a; i++)
+            matrix1.matrix[i] = new int[matrix1.b];
+        for (int i = 0; i < matrix1.a; i++)
+            for (int j = 0; j < matrix1.b; j++)
+                fin >> matrix1.matrix[i][j];
+        fin.close();
+    }
+    else {
+        cout << "файл не найден";
+    }
+}
+
+
+void choice()
+{
+    cout<<endl;
+    cout<<"выберете одну из операций:"<<endl;
+    cout<<endl;
+    cout<<"1) вывести матрицу"<<endl;
+    cout<<"2) сложить матрицу"<<endl;
+    cout<<"3) умножить матрицу"<<endl;
+    cout<<"4) транспонировать матрицу"<<endl;
+    cout<<"5) сохранить в файл"<<endl;
+    cout<<"6) вывести из файла"<<endl;
+    cout<<"7) виды сортировок матрицы "<<endl;
+    cout<<"8) завершить работу программы"<<endl;
+}
+
+
+
+int main(int argc, char* argv[] ) {
+    setlocale(LC_ALL, "russian");
+    int a, b;
+    matr matrix1;
+    createM(matrix1, argc, argv);
+    int ch;
+    while (true) {
+        choice();
+        cin >> ch;
+        switch (ch) {
+            case 1:
+                showM(matrix1);
+                break;
+            case 2:
+                sumM(matrix1);
+                break;
+            case 3:
+                umnozhM(matrix1);
+                break;
+            case 4:
+                transM(matrix1);
+                showM(matrix1);
+                break;
+            case 5:
+                safeintofileM(matrix1);
+                break;
+            case 6:
+                loadfromfileM(matrix1);
+                break;
+            case 8:
+                delete[] matrix1.matrix;
+                return 0;
+
+
+        }
+    }
+}
